@@ -39,6 +39,12 @@ Visual Studio with the C++ workload and Windows SDK, the D3D12 Agility SDK):
   needs an NVIDIA driver (`nvcuda.dll` / `libcuda.so.1`), not the toolkit.
   CUDA 13 works too, but needs a newer driver (R580+) and drops `sm_70`, so
   stick with 12.8.
+- **Visual Studio 2026** works without Visual Studio 2022: add its individual
+  component **"MSVC v143 – VS 2022 C++ x64/x86 build tools"**. The PhysX SDK
+  and Flow are then built with v143 as on VS 2022 (so CUDA 12.8 still works;
+  Blast brings its own compiler either way), and Godot builds with VS 2026's
+  own compiler; they link together fine. It needs a CMake that knows VS 2026
+  (the one VS 2026 installs does).
 
 On **Linux**, on top of a normal Godot Linux editor build: **CMake**, **git**
 and **clang** (the PhysX SDK is built with clang even when Godot itself is built
