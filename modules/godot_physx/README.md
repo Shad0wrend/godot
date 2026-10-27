@@ -515,7 +515,7 @@ the gas goes, with pressure projection, vorticity confinement and combustion
 (fuel, temperature, burn). It runs on Godot's own `RenderingDevice` (Vulkan or
 Direct3D 12), not CUDA, so it works on any GPU the Forward+ or Mobile renderer
 does. Nothing goes through the CPU unless `cpu_readback` is on (for
-`sample_smoke()`).
+`sample_smoke()` and `sample_temperature()`, e.g. heat damage from a fire).
 
 Gas comes from `PhysXFlowEmitter3D` nodes: a sphere or box with `velocity`,
 `temperature`, `fuel`, `burn`, `smoke`, `divergence` and `couple_rate`. An

@@ -158,6 +158,8 @@ void PhysXFlow3D::_stop() {
 	rd = nullptr;
 	last_smoke = nullptr;
 	last_smoke_size = 0;
+	last_temperature = nullptr;
+	last_temperature_size = 0;
 	gas_bounds = AABB();
 }
 
@@ -638,6 +640,8 @@ void PhysXFlow3D::_read_back() {
 	stat_readback_bytes = (int64_t)(temp_size + smoke_size);
 	last_smoke = smoke;
 	last_smoke_size = smoke_size;
+	last_temperature = temp;
+	last_temperature_size = temp_size;
 	float lo[3];
 	float hi[3];
 	if (FlowBackend::nanovdb_bounds(smoke, smoke_size, lo, hi)) {
@@ -663,20 +667,30 @@ void PhysXFlow3D::set_cpu_readback(bool p_v) {
 	if (!cpu_readback) {
 		last_smoke = nullptr;
 		last_smoke_size = 0;
+		last_temperature = nullptr;
+		last_temperature_size = 0;
 		gas_bounds = AABB();
 		stat_readback_bytes = 0;
 	}
 }
 
-float PhysXFlow3D::sample_smoke(const Vector3 &p_position) const {
-	if (!cpu_readback || last_smoke == nullptr) {
+float PhysXFlow3D::_sample_field(const uint8_t *p_field, uint64_t p_size, const Vector3 &p_position) const {
+	if (!cpu_readback || p_field == nullptr) {
 		return -1.0f;
 	}
 	const float origin[3] = { (float)p_position.x - 0.5f * cell_size, (float)p_position.y - 0.5f * cell_size, (float)p_position.z - 0.5f * cell_size };
 	const int dims[3] = { 1, 1, 1 };
 	float value = 0.0f;
-	FlowBackend::sample_dense(last_smoke, last_smoke_size, origin, cell_size, dims, 0, 1, &value, 1);
+	FlowBackend::sample_dense(p_field, p_size, origin, cell_size, dims, 0, 1, &value, 1);
 	return value;
+}
+
+float PhysXFlow3D::sample_smoke(const Vector3 &p_position) const {
+	return _sample_field(last_smoke, last_smoke_size, p_position);
+}
+
+float PhysXFlow3D::sample_temperature(const Vector3 &p_position) const {
+	return _sample_field(last_temperature, last_temperature_size, p_position);
 }
 
 Dictionary PhysXFlow3D::get_stats() const {
@@ -817,6 +831,7 @@ void PhysXFlow3D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_cpu_readback", "enabled"), &PhysXFlow3D::set_cpu_readback);
 	ClassDB::bind_method(D_METHOD("is_cpu_readback"), &PhysXFlow3D::is_cpu_readback);
 	ClassDB::bind_method(D_METHOD("sample_smoke", "position"), &PhysXFlow3D::sample_smoke);
+	ClassDB::bind_method(D_METHOD("sample_temperature", "position"), &PhysXFlow3D::sample_temperature);
 	ClassDB::bind_method(D_METHOD("is_running"), &PhysXFlow3D::is_running);
 	ClassDB::bind_method(D_METHOD("get_stats"), &PhysXFlow3D::get_stats);
 

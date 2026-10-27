@@ -32,6 +32,13 @@
 				The smoke at [param position] (world space), from the last CPU readback. Needs [member cpu_readback]; returns [code]-1.0[/code] without it. The readback lags a few frames behind the simulation.
 			</description>
 		</method>
+		<method name="sample_temperature" qualifiers="const">
+			<return type="float" />
+			<param index="0" name="position" type="Vector3" />
+			<description>
+				The temperature at [param position] (world space), from the last CPU readback, in the same units as [member PhysXFlowEmitter3D.temperature], [member ignition_temperature] and [member temperature_range] -- e.g. how much a fire hurts or how hot a sensor reads. Needs [member cpu_readback]; returns [code]-1.0[/code] without it. The readback lags a few frames behind the simulation.
+			</description>
+		</method>
 	</methods>
 	<members>
 		<member name="buoyancy" type="float" setter="set_buoyancy" getter="get_buoyancy" default="2.0">
@@ -56,7 +63,7 @@
 			How fast the gas cools (exponential, per second).
 		</member>
 		<member name="cpu_readback" type="bool" setter="set_cpu_readback" getter="is_cpu_readback" default="false">
-			Copy temperature and smoke back to the CPU every few steps, for [method sample_smoke] and the [code]bounds[/code] in [method get_stats]. Off by default: it costs a full field copy each time and isn't needed for rendering.
+			Copy temperature and smoke back to the CPU every few steps, for [method sample_smoke], [method sample_temperature] and the [code]bounds[/code] in [method get_stats]. Off by default: it costs a full field copy each time and isn't needed for rendering.
 		</member>
 		<member name="emission_strength" type="float" setter="set_emission_strength" getter="get_emission_strength" default="4.0">
 			How bright the [member heat_ramp] glow is. [code]0[/code] turns glowing off.

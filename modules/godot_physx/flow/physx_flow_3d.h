@@ -109,13 +109,16 @@ private:
 	// the default 5 cm cells -- fewer leaves wide gas lit almost evenly.
 	int shadow_steps = 48;
 
-	// Optional copy of the gas on the CPU, for sample_smoke() and stats:
+	// Optional copy of the gas on the CPU, for sample_smoke(),
+	// sample_temperature() and stats:
 	// every READBACK_INTERVAL steps (a full field each time).
 	bool cpu_readback = false;
 	static constexpr int READBACK_INTERVAL = 4;
 	uint64_t step_count = 0;
 	const uint8_t *last_smoke = nullptr;
 	uint64_t last_smoke_size = 0;
+	const uint8_t *last_temperature = nullptr;
+	uint64_t last_temperature_size = 0;
 	AABB gas_bounds;
 
 	// Stats.
@@ -181,6 +184,7 @@ private:
 	void _gather_light(Vector3 &r_direction, Color &r_color, Color &r_ambient);
 	void _fill_render_settings(FlowBackend::Settings &r_settings);
 	void _read_back();
+	float _sample_field(const uint8_t *p_field, uint64_t p_size, const Vector3 &p_position) const;
 
 protected:
 	void _notification(int p_what);
@@ -252,6 +256,8 @@ public:
 	// Smoke at a world position, from the last CPU readback (needs
 	// cpu_readback; -1 without it).
 	float sample_smoke(const Vector3 &p_position) const;
+	// Temperature at a world position, the same way.
+	float sample_temperature(const Vector3 &p_position) const;
 
 	bool is_running() const { return grid != nullptr; }
 	Dictionary get_stats() const;
